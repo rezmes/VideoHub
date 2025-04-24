@@ -1,0 +1,11 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "isCreatingSolution": true,
+    "environment": "onprem19",
+    "version": "1.10.0",
+    "libraryName": "video-hub",
+    "libraryId": "9b514be4-9002-4c03-a842-96b12aef280b",
+    "packageManager": "npm",
+    "componentType": "webpart"
+  }
+}
