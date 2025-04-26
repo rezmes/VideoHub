@@ -1,4 +1,90 @@
 // // // // //-------------------------------------------------------LEFTy
+// import {
+//   BaseClientSideWebPart,
+//   IPropertyPaneConfiguration,
+//   PropertyPaneTextField
+// } from '@microsoft/sp-webpart-base';
+// import { Version } from '@microsoft/sp-core-library';
+// import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+// import * as React    from 'react';
+// import * as ReactDom from 'react-dom';
+
+// import VideoHub from './components/VideoHub';
+// import { IVideo }  from './components/IVideo';
+
+// export interface IVideoHubWebPartProps { libraryName: string; }
+
+// export default class VideoHubWebPart
+//   extends BaseClientSideWebPart<IVideoHubWebPartProps> {
+
+//   public render(): void {
+//     this._load()
+//       .then(v => ReactDom.render(React.createElement(VideoHub,{ videos:v }), this.domElement))
+//       .catch(e => ReactDom.render(React.createElement('p',{},'⚠ '+e.message), this.domElement));
+//   }
+
+//   /* -------- REST ---------- */
+//   private _load(): Promise<IVideo[]> {
+
+//     const list = this.properties.libraryName || 'KMSVideoHub';
+
+//     const url =
+//       `${this.context.pageContext.web.absoluteUrl}` +
+//       `/_api/web/lists/getbytitle('${list}')/items` +
+//       `?$select=Id,Title,FileRef,FileLeafRef,ThumbnailURL,MediaDuration` +
+//       `&$filter=File_x0020_Type eq 'mp4'` +
+//       `&$orderby=Modified desc&$top=30`;
+
+//     return this.context.spHttpClient
+//       .get(url, SPHttpClient.configurations.v1)
+//       .then((r:SPHttpClientResponse)=>{ if(!r.ok){throw new Error('HTTP '+r.status);} return r.json();})
+//       .then(j => (j.value as any[] || []).map(it => {
+
+//         const thumb = (it.ThumbnailURL && it.ThumbnailURL.Url)
+//             ? it.ThumbnailURL.Url
+//             : `${this.context.pageContext.web.absoluteUrl}/_layouts/15/images/videoicon.png`;
+
+//         /* modern player url */
+//         const fileRef = it.FileRef as string;
+//         const encodedFile = encodeURIComponent(fileRef);
+//         const parent = fileRef.substring(0, fileRef.lastIndexOf('/'));
+//         const encodedParent = encodeURIComponent(parent);
+//         const modernUrl = `${parent}/Forms/AllItems.aspx?id=${encodedFile}&parent=${encodedParent}`;
+
+//         return {
+//           id: it.Id,
+//           title: decodeURIComponent(it.Title || it.FileLeafRef || 'Video'),
+//           url: modernUrl,
+//           previewUrl: thumb,
+//           duration: it.MediaDuration || ''
+//         } as IVideo;
+//       }));
+//   }
+
+//   protected onDispose(): void { ReactDom.unmountComponentAtNode(this.domElement); }
+//   protected get dataVersion(): Version { return Version.parse('1.0'); }
+
+//   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
+//     return {
+//       pages:[{
+//         header:{ description:'Settings' },
+//         groups:[{
+//           groupFields:[
+//             PropertyPaneTextField('libraryName',{ label:'Library title', value:'KMSVideoHub' })
+//           ]
+//         }]
+//       }]
+//     };
+//   }
+// }
+
+
+
+
+
+
+// // //-------------------------------------------------------RIGHTy
+
 import { Version } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -6,10 +92,10 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-import * as React    from 'react';
+import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
-import VideoHub   from './components/VideoHub';
+import VideoHub from './components/VideoHub';
 import { IVideo } from './components/IVideo';
 
 export interface IVideoHubWebPartProps { libraryName: string; }
@@ -20,61 +106,71 @@ export default class VideoHubWebPart
   public render(): void {
     this._load()
       .then(videos =>
-        ReactDom.render(React.createElement(VideoHub,{ videos }), this.domElement)
+        ReactDom.render(React.createElement(VideoHub, { videos }), this.domElement)
       )
       .catch(err =>
-        ReactDom.render(React.createElement('p',{}, `⚠️ ${err.message}`), this.domElement)
+        ReactDom.render(React.createElement('p', {}, `⚠️ ${err.message}`), this.domElement)
       );
   }
 
   /* ---------- REST + thumbnail picker ---------- */
   private _load(): Promise<IVideo[]> {
 
-    const list = this.properties.libraryName || 'KMSVideos';
-
+    const list = this.properties.libraryName || 'KMSVideoHub';
+    
+    // Get the current page URL for the return link
+    const currentPageUrl = window.location.href;
+    
+    // Simplified query - no filter, we'll filter client-side
     const url =
       `${this.context.pageContext.web.absoluteUrl}` +
       `/_api/web/lists/getbytitle('${list}')/items` +
-      `?$select=Id,Title,EncodedAbsUrl,ThumbnailURL,url,FileLeafRef,File/ServerRelativeUrl` +
-      `&$expand=File` +
-      `&$filter=File_x0020_Type eq 'mp4'` +
-      `&$orderby=Modified desc&$top=30`;
+      `?$select=Id,Title,FileRef,FileLeafRef,ThumbnailURL,MediaDuration` +
+      `&$orderby=Modified desc&$top=50`;
 
     return this.context.spHttpClient
       .get(url, SPHttpClient.configurations.v1)
-      .then((r: SPHttpClientResponse) => r.json())
-      .then(j => (j.value || []).map((it:any) => {
-
-        /* choose thumbnail */
-        let thumb: string = '';
-
-        if (it.ThumbnailURL && it.ThumbnailURL.Url) {
-          thumb = it.ThumbnailURL.Url;
-        } else if (it.url && it.url.Url) {
-          thumb = it.url.Url;
-        } else {
-          /* build “Preview Images/<name>_mp4.png” */
-          const folder = it.EncodedAbsUrl.substring(0, it.EncodedAbsUrl.lastIndexOf('/'));
-          const bare   = encodeURIComponent(
-                           decodeURIComponent(it.FileLeafRef).replace(/\.[^/.]+$/, ''));
-          thumb = `${folder}/Preview%20Images/${bare}_mp4.png`;
-        }
-
-        /* fallback icon if still empty */
-        if (!thumb) {
-          thumb = `${this.context.pageContext.web.absoluteUrl}/_layouts/15/images/icvideo.png`;
-        }
-
-        /* clean title */
-        const tit = decodeURIComponent(it.Title || it.FileLeafRef || 'Video');
-
-        return {
-          id: it.Id,
-          title: tit,
-          url:  it.EncodedAbsUrl,
-          previewUrl: thumb
-        } as IVideo;
-      }));
+      .then((r: SPHttpClientResponse) => {
+        if (!r.ok) { throw new Error(`HTTP ${r.status}`); }
+        return r.json();
+      })
+      .then(j => {
+        // Filter MP4 files client-side
+        const items = j.value || [];
+        const mp4Items = items.filter(item => 
+          item.FileLeafRef && item.FileLeafRef.toLowerCase().endsWith('.mp4')
+        );
+        
+        return mp4Items.map((it: any) => {
+          // Get thumbnail URL from ThumbnailURL field
+          const thumb = it.ThumbnailURL && it.ThumbnailURL.Url 
+            ? it.ThumbnailURL.Url 
+            : `${this.context.pageContext.web.absoluteUrl}/_layouts/15/images/videoicon.png`;
+          
+          // Create the modern player URL based on the example
+          const fileRef = it.FileRef || '';
+          
+          // Format: /sites/kms/KMSVideoHub/Forms/AllItems.aspx?id=%2Fsites%2Fkms%2FKMSVideoHub%2FFileName&parent=%2Fsites%2Fkms%2FKMSVideoHub&source=<currentPageUrl>
+          const encodedFileRef = encodeURIComponent(fileRef);
+          const parentFolder = fileRef.substring(0, fileRef.lastIndexOf('/'));
+          const encodedParentFolder = encodeURIComponent(parentFolder);
+          const encodedSourceUrl = encodeURIComponent(currentPageUrl);
+          
+          // Use 'source' parameter instead of 'src' for return URL
+         // Build modern viewer URL that returns to the gallery
+const modernPlayerUrl =
+`${parentFolder}/Forms/AllItems.aspx?Source=${encodeURIComponent(currentPageUrl)}` +
+`&id=${encodedFileRef}&parent=${encodedParentFolder}`;
+            
+          return {
+            id: it.Id,
+            title: it.Title || (it.FileLeafRef ? it.FileLeafRef.replace('.mp4', '') : 'Untitled Video'),
+            url: modernPlayerUrl,
+            previewUrl: thumb,
+            duration: it.MediaDuration || ''
+          } as IVideo;
+        });
+      });
   }
 
   protected onDispose(): void { ReactDom.unmountComponentAtNode(this.domElement); }
@@ -82,161 +178,17 @@ export default class VideoHubWebPart
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
-      pages:[{
-        header:{ description:'Settings' },
-        groups:[{
-          groupFields:[
-            PropertyPaneTextField('libraryName',{ label:'Library title', value:'KMSVideos' })
+      pages: [{
+        header: { description: 'Settings' },
+        groups: [{
+          groupFields: [
+            PropertyPaneTextField('libraryName', { 
+              label: 'Library title', 
+              value: 'KMSVideoHub' 
+            })
           ]
         }]
       }]
     };
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // //-------------------------------------------------------RIGHTy
-// VideoHubWebPart.ts
-// import {
-//   BaseClientSideWebPart
-// } from '@microsoft/sp-webpart-base';
-// import { Version } from '@microsoft/sp-core-library';
-// import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-// import * as React from 'react';
-// import * as ReactDom from 'react-dom';
-// import {
-//   IPropertyPaneConfiguration,
-//   PropertyPaneTextField
-// } from '@microsoft/sp-webpart-base';
-// import VideoHub from './components/VideoHub';
-// import { IVideo } from './components/IVideo';
-
-// export interface IVideoHubWebPartProps {
-//   libraryName: string;
-// }
-
-// export default class VideoHubWebPart
-//   extends BaseClientSideWebPart<IVideoHubWebPartProps> {
-
-//   public render(): void {
-//     this._getVideos()
-//       .then(videos => {
-//         ReactDom.render(React.createElement(VideoHub, { videos }), this.domElement);
-//       })
-//       .catch(err => {
-//         ReactDom.render(
-//           React.createElement('div', {}, [
-//             React.createElement('h3', {}, '⚠️ Error loading videos'),
-//             React.createElement('p', {}, err.message)
-//           ]),
-//           this.domElement
-//         );
-//       });
-//   }
-
-//   private _getVideos(): Promise<IVideo[]> {
-//     const libraryName = this.properties.libraryName || 'KMSVideos';
-//     const url =
-//       `${this.context.pageContext.web.absoluteUrl}` +
-//       `/_api/web/lists/getbytitle('${libraryName}')/items` +
-//       `?$select=Id,Title,EncodedAbsUrl,ThumbnailURL,url,File_x0020_Type,FileLeafRef` +
-//       `&$filter=File_x0020_Type eq 'mp4'` +
-//       `&$orderby=Modified desc&$top=30`;
-
-//     return this.context.spHttpClient
-//       .get(url, SPHttpClient.configurations.v1)
-//       .then((r: SPHttpClientResponse) => {
-//         if (!r.ok) { throw new Error(`HTTP ${r.status}`); }
-//         return r.json();
-//       })
-//       .then(data => this._processVideoItems(data.value || []));
-//   }
-
-//   private _processVideoItems(items: any[]): IVideo[] {
-//     if (!items || items.length === 0) {
-//       return [];
-//     }
-
-//     return items.map((item: any) => {
-//       // Try to get the thumbnail URL from various possible sources
-//       let thumbnailUrl = '';
-
-//       // First check if ThumbnailURL exists and has a Url property
-//       if (item.ThumbnailURL && typeof item.ThumbnailURL === 'object' && item.ThumbnailURL.Url) {
-//         thumbnailUrl = item.ThumbnailURL.Url;
-//       }
-//       // Check if url field exists and has a Url property
-//       else if (item.url && typeof item.url === 'object' && item.url.Url) {
-//         thumbnailUrl = item.url.Url;
-//       }
-//       // For the "simens" video specifically - hardcode the known working path
-//       else if (item.FileLeafRef && item.FileLeafRef.toLowerCase().includes('simens')) {
-//         thumbnailUrl = `${this.context.pageContext.web.absoluteUrl}/sites/kms/KMSVideos/simens/Preview%20Images/simens.png`;
-//       }
-
-//       // If we still don't have a thumbnail, use a generic icon
-//       if (!thumbnailUrl) {
-//         thumbnailUrl = `${this.context.pageContext.web.absoluteUrl}/_layouts/15/images/videoicon.png`;
-//       }
-
-//       // Clean up the title
-//       let title = item.Title || '';
-//       if (!title && item.FileLeafRef) {
-//         title = item.FileLeafRef.replace(/\.[^/.]+$/, ""); // Remove extension
-//         title = decodeURIComponent(title); // Decode URL encoding
-//       }
-
-//       return {
-//         id: item.Id,
-//         title: title || 'Untitled Video',
-//         url: item.EncodedAbsUrl || '',
-//         previewUrl: thumbnailUrl
-//       } as IVideo;
-//     });
-//   }
-
-//   protected onDispose(): void {
-//     ReactDom.unmountComponentAtNode(this.domElement);
-//   }
-
-//   protected get dataVersion(): Version {
-//     return Version.parse('1.0');
-//   }
-
-//   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-//     return {
-//       pages: [{
-//         header: { description: 'Settings' },
-//         groups: [{
-//           groupFields: [
-//             PropertyPaneTextField('libraryName', {
-//               label: 'Library title',
-//               value: 'KMSVideos'
-//             })
-//           ]
-//         }]
-//       }]
-//     };
-//   }
-// }
-
