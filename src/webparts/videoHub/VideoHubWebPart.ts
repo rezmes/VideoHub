@@ -157,10 +157,14 @@ export default class VideoHubWebPart
           const encodedSourceUrl = encodeURIComponent(currentPageUrl);
           
           // Use 'source' parameter instead of 'src' for return URL
-         // Build modern viewer URL that returns to the gallery
+//          // Build modern viewer URL that returns to the gallery
+// const modernPlayerUrl =
+// `${parentFolder}/Forms/AllItems.aspx?Source=${encodeURIComponent(currentPageUrl)}` +
+// `&id=${encodedFileRef}&parent=${encodedParentFolder}`;
+// Build modern viewer URL that returns to the gallery
 const modernPlayerUrl =
-`${parentFolder}/Forms/AllItems.aspx?Source=${encodeURIComponent(currentPageUrl)}` +
-`&id=${encodedFileRef}&parent=${encodedParentFolder}`;
+  `${parentFolder}/Forms/AllItems.aspx?Source=${encodeURIComponent(currentPageUrl)}` +
+  `&id=${encodedFileRef}&parent=${encodedParentFolder}`;
             
           return {
             id: it.Id,
