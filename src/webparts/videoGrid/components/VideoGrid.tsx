@@ -6,6 +6,7 @@ import {
   DocumentCardPreview,
   IDocumentCardPreviewProps,
 } from "office-ui-fabric-react/lib/DocumentCard";
+import { ImageFit } from "office-ui-fabric-react/lib/Image";
 import {
   VideoHubStateService,
   IVideoFilterOptions,
@@ -15,6 +16,7 @@ import styles from "../../videoHub/components/VideoHub.module.scss";
 
 export interface IVideoGridProps {
   isRTL?: boolean;
+  webUrl?: string;
 }
 
 export interface IVideoGridState {
@@ -38,26 +40,18 @@ export default class VideoGrid extends React.Component<
       filterOptions: this._stateService.getFilterOptions(),
     };
 
-    // Bind methods
     this._handleStateChange = this._handleStateChange.bind(this);
   }
 
   public componentDidMount(): void {
-    // Subscribe to state changes
     this._stateService.subscribe(this._handleStateChange);
-    console.log("VideoGrid mounted and subscribed to state changes");
   }
 
   public componentWillUnmount(): void {
-    // Unsubscribe from state changes
     this._stateService.unsubscribe(this._handleStateChange);
-    console.log("VideoGrid unmounted and unsubscribed from state changes");
   }
 
   private _handleStateChange(): void {
-    console.log("VideoGrid received state change notification");
-
-    // Update filtered videos when state changes
     this.setState({
       filteredVideos: this._getFilteredVideos(),
       filterOptions: this._stateService.getFilterOptions(),
@@ -67,16 +61,13 @@ export default class VideoGrid extends React.Component<
   private _parseDuration(duration: string): number {
     if (!duration) return 0;
 
-    // Try to parse duration in format "MM:SS" or "HH:MM:SS"
     const parts = duration.split(":").map(function (part) {
       return parseInt(part, 10);
     });
 
     if (parts.length === 2) {
-      // MM:SS format
       return parts[0] * 60 + parts[1];
     } else if (parts.length === 3) {
-      // HH:MM:SS format
       return parts[0] * 3600 + parts[1] * 60 + parts[2];
     }
 
@@ -87,10 +78,7 @@ export default class VideoGrid extends React.Component<
     const videos = this._stateService.getVideos();
     const filterOptions = this._stateService.getFilterOptions();
 
-    console.log("Filtering videos with options:", filterOptions);
-    console.log("Total videos before filtering:", videos.length);
-
-    let filtered = videos.slice(); // Create a copy of the array
+    let filtered = videos.slice();
 
     // Filter by search term
     if (filterOptions.searchTerm) {
@@ -102,7 +90,6 @@ export default class VideoGrid extends React.Component<
         }
       }
       filtered = tempFiltered;
-      console.log("After search term filter:", filtered.length);
     }
 
     // Filter by category
@@ -114,7 +101,6 @@ export default class VideoGrid extends React.Component<
         }
       }
       filtered = tempFiltered;
-      console.log("After category filter:", filtered.length);
     }
 
     // Filter by department
@@ -126,7 +112,6 @@ export default class VideoGrid extends React.Component<
         }
       }
       filtered = tempFiltered;
-      console.log("After department filter:", filtered.length);
     }
 
     // Filter by duration
@@ -154,7 +139,6 @@ export default class VideoGrid extends React.Component<
         }
       }
       filtered = tempFiltered;
-      console.log("After duration filter:", filtered.length);
     }
 
     // Sort videos
@@ -175,15 +159,16 @@ export default class VideoGrid extends React.Component<
       return filterOptions.sortDirection === "asc" ? comparison : -comparison;
     });
 
-    console.log("Final filtered videos count:", filtered.length);
     return filtered;
   }
 
-  // src/webparts/videoGrid/components/VideoGrid.tsx
   public render(): React.ReactElement<IVideoGridProps> {
-    const { isRTL } = this.props;
+    const { isRTL, webUrl } = this.props;
     const { filteredVideos } = this.state;
     const cardW = 220;
+
+    // Get total video count
+    const totalVideos = this._stateService.getVideos().length;
 
     // Apply RTL classes conditionally
     const gridClass = isRTL
@@ -192,24 +177,39 @@ export default class VideoGrid extends React.Component<
 
     return (
       <div className={styles.gridContainer}>
+        <div className={styles.gridHeader}>
+          <div className={styles.videoCount}>
+            {filteredVideos.length > 0
+              ? `Showing ${filteredVideos.length} of ${totalVideos} videos`
+              : totalVideos > 0
+              ? "No videos match your search criteria"
+              : "Loading videos..."}
+          </div>
+        </div>
+
         {!filteredVideos || filteredVideos.length === 0 ? (
           <div className={styles.noResults}>
-            {this._stateService.getVideos().length === 0
-              ? "Loading videos..."
-              : "No videos match your search criteria."}
+            {this._stateService.getVideos().length === 0 ? (
+              <div className={styles.loadingSpinner}></div>
+            ) : (
+              "No videos match your search criteria."
+            )}
           </div>
         ) : (
           <div className={gridClass}>
-            {/* Rest of your render code */}
-
-            {filteredVideos.map(function (v) {
+            {filteredVideos.map((v) => {
               const prev: IDocumentCardPreviewProps = {
                 previewImages: [
                   {
                     previewImageSrc:
-                      v.previewUrl || `/_layouts/15/images/videoicon.png`,
+                      v.previewUrl ||
+                      `${webUrl}/_layouts/15/next/odspnext/odsp-media/images/itemtypes/96/video.png`,
                     width: cardW,
                     height: 125,
+                    imageFit: v.previewUrl ? ImageFit.cover : ImageFit.center,
+                    iconSrc: !v.previewUrl
+                      ? `${webUrl}/_layouts/15/next/odspnext/odsp-media/images/itemtypes/96/video.png`
+                      : undefined,
                   },
                 ],
               };
@@ -217,13 +217,42 @@ export default class VideoGrid extends React.Component<
               return (
                 <a key={v.id} href={v.url} className={styles.videoCard}>
                   <div className={styles.cardContent}>
-                    <DocumentCard>
-                      <DocumentCardPreview {...prev} />
-                      <DocumentCardTitle title={v.title} />
+                    <div className={styles.thumbnailContainer}>
+                      {v.previewUrl &&
+                      v.previewUrl !== `/_layouts/15/images/videoicon.png` ? (
+                        <img
+                          src={v.previewUrl}
+                          className={styles.thumbnailImage}
+                          alt={v.title}
+                        />
+                      ) : (
+                        <div
+                          className={styles.defaultThumbnail}
+                          style={{
+                            backgroundImage: `url('${webUrl}/_layouts/15/next/odspnext/odsp-media/images/itemtypes/96/video.png')`,
+                          }}
+                        />
+                      )}
                       {v.duration && (
-                        <div className={styles.durationText}>
-                          Duration: {v.duration}
-                        </div>
+                        <div className={styles.durationBadge}>{v.duration}</div>
+                      )}
+                    </div>
+                    <div className={styles.cardBody}>
+                      <DocumentCardTitle title={v.title} />
+                      <div className={styles.videoStats}>
+                        {v.viewCount !== undefined && (
+                          <span className={styles.viewCount}>
+                            {v.viewCount} {v.viewCount === 1 ? "view" : "views"}
+                          </span>
+                        )}
+                        {v.uploadDate && (
+                          <span className={styles.uploadDate}>
+                            {v.uploadDate}
+                          </span>
+                        )}
+                      </div>
+                      {v.author && (
+                        <div className={styles.authorText}>{v.author}</div>
                       )}
                       {v.category && (
                         <div className={styles.metadataText}>
@@ -235,7 +264,7 @@ export default class VideoGrid extends React.Component<
                           Dept: {v.department}
                         </div>
                       )}
-                    </DocumentCard>
+                    </div>
                   </div>
                 </a>
               );

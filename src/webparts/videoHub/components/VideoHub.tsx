@@ -1,6 +1,4 @@
-// // //-------------------------------------------------------LEFTy
-// VideoHub.tsx - Updated with filtering and sorting
-// VideoHub.tsx
+// src/webparts/videoHub/components/VideoHub.tsx
 import * as React from "react";
 import { IVideo } from "../../../shared/IVideo";
 import {
@@ -21,6 +19,7 @@ import styles from "./VideoHub.module.scss";
 export interface IVideoHubProps {
   videos: IVideo[];
   isRTL?: boolean;
+  webUrl?: string;
 }
 
 export interface IVideoHubState {
@@ -280,11 +279,29 @@ export default class VideoHub extends React.Component<
     this.setState({ filteredVideos: filtered });
   };
 
+  private _resetFilters = (): void => {
+    this.setState(
+      {
+        searchTerm: "",
+        selectedCategory: "",
+        selectedDepartment: "",
+        durationFilter: "all",
+        sortBy: "title",
+        sortDirection: "asc",
+      },
+      () => {
+        this._filterAndSortVideos();
+      }
+    );
+  };
+
   public render(): React.ReactElement<IVideoHubProps> {
-    // Extract isRTL from props
-    const { isRTL } = this.props;
+    const { isRTL, webUrl } = this.props;
     const { filteredVideos, sortDirection } = this.state;
     const cardW = 220;
+
+    // Get total video count
+    const totalVideos = this.props.videos.length;
 
     // Apply RTL classes conditionally
     const containerClass = isRTL
@@ -316,12 +333,22 @@ export default class VideoHub extends React.Component<
 
     return (
       <div className={containerClass}>
+        <div className={styles.filterHeader}>
+          <h3 className={styles.filterTitle}>Video Hub</h3>
+          <DefaultButton
+            text="Reset Filters"
+            onClick={this._resetFilters}
+            className={styles.resetButton}
+          />
+        </div>
+
         <div className={styles.controlsContainer}>
           <div className={rowClass}>
             <div className={itemClass}>
               <TextField
                 placeholder="Search videos..."
                 onChange={this._handleSearch}
+                value={this.state.searchTerm}
                 ariaLabel="Search videos"
               />
             </div>
@@ -373,18 +400,31 @@ export default class VideoHub extends React.Component<
           </div>
         </div>
 
+        <div className={styles.gridHeader}>
+          <div className={styles.videoCount}>
+            {filteredVideos.length > 0
+              ? `Showing ${filteredVideos.length} of ${totalVideos} videos`
+              : totalVideos > 0
+              ? "No videos match your search criteria"
+              : "Loading videos..."}
+          </div>
+        </div>
+
         {filteredVideos.length === 0 ? (
           <div className={styles.noResults}>
             No videos match your search criteria.
           </div>
         ) : (
           <div className={gridClass}>
-            {filteredVideos.map(function (v) {
+            {filteredVideos.map((v) => {
               const prev: IDocumentCardPreviewProps = {
                 previewImages: [
                   {
                     previewImageSrc:
-                      v.previewUrl || `/_layouts/15/images/videoicon.png`,
+                      v.previewUrl ||
+                      `${
+                        webUrl || ""
+                      }/_layouts/15/next/odspnext/odsp-media/images/itemtypes/96/video.png`,
                     width: cardW,
                     height: 125,
                   },
@@ -394,13 +434,44 @@ export default class VideoHub extends React.Component<
               return (
                 <a key={v.id} href={v.url} className={styles.videoCard}>
                   <div className={styles.cardContent}>
-                    <DocumentCard>
-                      <DocumentCardPreview {...prev} />
-                      <DocumentCardTitle title={v.title} />
+                    <div className={styles.thumbnailContainer}>
+                      {v.previewUrl &&
+                      v.previewUrl !== `/_layouts/15/images/videoicon.png` ? (
+                        <img
+                          src={v.previewUrl}
+                          className={styles.thumbnailImage}
+                          alt={v.title}
+                        />
+                      ) : (
+                        <div
+                          className={styles.defaultThumbnail}
+                          style={{
+                            backgroundImage: `url('${
+                              webUrl || ""
+                            }/_layouts/15/next/odspnext/odsp-media/images/itemtypes/96/video.png')`,
+                          }}
+                        />
+                      )}
                       {v.duration && (
-                        <div className={styles.durationText}>
-                          Duration: {v.duration}
-                        </div>
+                        <div className={styles.durationBadge}>{v.duration}</div>
+                      )}
+                    </div>
+                    <div className={styles.cardBody}>
+                      <DocumentCardTitle title={v.title} />
+                      <div className={styles.videoStats}>
+                        {v.viewCount !== undefined && (
+                          <span className={styles.viewCount}>
+                            {v.viewCount} {v.viewCount === 1 ? "view" : "views"}
+                          </span>
+                        )}
+                        {v.uploadDate && (
+                          <span className={styles.uploadDate}>
+                            {v.uploadDate}
+                          </span>
+                        )}
+                      </div>
+                      {v.author && (
+                        <div className={styles.authorText}>{v.author}</div>
                       )}
                       {v.category && (
                         <div className={styles.metadataText}>
@@ -412,7 +483,7 @@ export default class VideoHub extends React.Component<
                           Dept: {v.department}
                         </div>
                       )}
-                    </DocumentCard>
+                    </div>
                   </div>
                 </a>
               );

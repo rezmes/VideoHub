@@ -328,3 +328,216 @@
   text-align: right;
 }
 
+/* VideoHub.module.scss */
+.filterContainer {
+  margin-bottom: 16px;
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.filterTitle {
+  margin: 0;
+  font-size: 18px;
+  color: #030303;
+}
+
+.resetButton {
+  background-color: #f2f2f2;
+  border: none;
+  &:hover {
+    background-color: #e5e5e5;
+  }
+}
+
+.gridContainer {
+  margin: 0 -8px;
+}
+
+.gridHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.videoCount {
+  font-size: 14px;
+  color: #606060;
+}
+
+.controlsContainer {
+  margin-bottom: 16px;
+}
+
+.controlsRow {
+  display: flex;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.controlsRowRtl {
+  flex-direction: row-reverse;
+}
+
+.controlItem {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.controlItemRtl {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.videoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.videoGridRtl {
+  text-align: right;
+}
+
+.videoCard {
+  width: 220px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+}
+
+.cardContent {
+  width: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.cardBody {
+  padding: 12px;
+}
+
+.durationText {
+  padding: 4px 0;
+  font-size: 12px;
+  color: #606060;
+}
+
+.metadataText {
+  padding: 2px 0;
+  font-size: 12px;
+  color: #606060;
+}
+
+.sortButton {
+  margin-top: 24px;
+}
+
+.noResults {
+  padding: 32px;
+  text-align: center;
+  font-style: italic;
+  color: #606060;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  border-top-color: #3f51b5;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+.thumbnailContainer {
+  position: relative;
+}
+
+.durationBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.videoStats {
+  display: flex;
+  justify-content: space-between;
+  color: #606060;
+  font-size: 12px;
+  margin: 4px 0 8px 0;
+}
+
+.viewCount, .uploadDate {
+  display: inline-block;
+}
+.thumbnailContainer {
+  position: relative;
+  height: 125px;
+  background-color: #f2f2f2;
+  overflow: hidden;
+}
+
+.defaultThumbnail {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px; /* Set to the natural size of the icon */
+  height: 48px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This ensures the image covers the container without distortion */
+}
+.authorText {
+  font-size: 12px;
+  color: #606060;
+  margin-bottom: 4px;
+}
+.authorText {
+  font-size: 12px;
+  color: #606060;
+  margin-bottom: 4px;
+}

@@ -1,5 +1,7 @@
 // src/webparts/videoGrid/VideoGridWebPart.ts
-// import * as strings from '../videoHub/loc/mystrings';
+// At the top of your VideoGridWebPart.ts file, add this import:
+import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
@@ -15,6 +17,7 @@ import { VideoLoaderService } from '../../shared/VideoLoaderService';
 
 export interface IVideoGridWebPartProps {
   libraryName: string;
+
 }
 
 export default class VideoGridWebPart extends BaseClientSideWebPart<IVideoGridWebPartProps> {
@@ -28,7 +31,8 @@ export default class VideoGridWebPart extends BaseClientSideWebPart<IVideoGridWe
   }
 
   // In VideoGridWebPart.ts
-// src/webparts/videoGrid/VideoGridWebPart.ts
+
+// In VideoGridWebPart.ts
 public render(): void {
   // Show loading indicator
   ReactDom.render(
@@ -39,31 +43,66 @@ public render(): void {
   // Detect if the page is in RTL mode
   const isRTL = document.documentElement.getAttribute('dir') === 'rtl';
 
-  // Get the state service instance
-  const stateService = VideoHubStateService.getInstance();
-  console.log('Grid web part using state service instance:', stateService);
+  // First, check if the list exists
+  console.log('Checking if list exists...');
+  this.context.spHttpClient
+    .get(`${this.context.pageContext.web.absoluteUrl}/_api/web/lists?$filter=Title eq '${this.properties.libraryName || 'KMSVideoHub'}'`,
+      SPHttpClient.configurations.v1)
+    .then(r => r.json())
+    .then(result => {
+      if (result.value && result.value.length > 0) {
+        console.log('List found:', result.value[0].Title);
 
-  // Render the grid component first so it can subscribe to state changes
-  ReactDom.render(
-    React.createElement(VideoGrid, { isRTL }),
-    this.domElement
-  );
+        // Now try to get a single item to test basic access
+        console.log('Testing basic item access...');
+        return this.context.spHttpClient
+          .get(`${this.context.pageContext.web.absoluteUrl}/_api/web/lists/getbytitle('${this.properties.libraryName || 'KMSVideoHub'}')/items?$top=1`,
+            SPHttpClient.configurations.v1)
+          .then(r => {
+            if (!r.ok) {
+              console.error('Error accessing items:', r.status, r.statusText);
+              throw new Error(`HTTP ${r.status}`);
+            }
+            return r.json();
+          })
+          .then(itemResult => {
+            console.log('Basic item access successful, found items:', itemResult.value.length);
 
-  // Then load videos
-  const list = this.properties.libraryName || 'KMSVideoHub';
-  const currentPageUrl = window.location.href;
+// In VideoGridWebPart.ts
+// Replace the loadVideosWithThumbnails call with loadVideosWithCreatedAndAuthor
+console.log('Loading videos with Created, Author, and metadata...');
+const loaderService = VideoLoaderService.getInstance();
+return loaderService.loadVideosWithCreatedAndAuthor(
+  this.context.pageContext.web.absoluteUrl,
+  this.properties.libraryName || 'KMSVideoHub',
+  this.context.spHttpClient,
+  window.location.href
+);
+          })
+          .then(videos => {
+            console.log('Videos loaded successfully:', videos.length);
 
-  this._loaderService.loadVideos(
-    this.context.pageContext.web.absoluteUrl,
-    list,
-    this.context.spHttpClient,
-    currentPageUrl
-  )
-    .then(videos => {
-      console.log('Videos loaded successfully:', videos.length);
+            // Update the shared state service with the videos
+            const stateService = VideoHubStateService.getInstance();
+            stateService.setVideos(videos);
 
-      // Update the shared state service with the videos
-      stateService.setVideos(videos);
+            // Render the grid component
+            ReactDom.render(
+              React.createElement(VideoGrid, {
+                isRTL,
+                webUrl: this.context.pageContext.web.absoluteUrl
+              }),
+              this.domElement
+            );
+          });
+      } else {
+        console.error('List not found:', this.properties.libraryName || 'KMSVideoHub');
+        ReactDom.render(
+          React.createElement('p', {}, `⚠️ Library "${this.properties.libraryName || 'KMSVideoHub'}" not found`),
+          this.domElement
+        );
+        return Promise.reject(new Error('List not found'));
+      }
     })
     .catch(err => {
       console.error('Error loading videos:', err);
@@ -73,6 +112,9 @@ public render(): void {
       );
     });
 }
+
+
+
 
 
 }

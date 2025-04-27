@@ -8,4 +8,7 @@ export interface IVideo {
   duration: string;
   category: string;
   department: string;
+  viewCount?: number;
+  uploadDate?: string;
+  author?: string;  // Add this line
 }

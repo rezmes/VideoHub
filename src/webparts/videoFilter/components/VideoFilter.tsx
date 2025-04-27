@@ -44,32 +44,21 @@ export default class VideoFilter extends React.Component<
       departmentOptions,
     };
 
-    // Bind methods
     this._handleStateChange = this._handleStateChange.bind(this);
   }
 
   public componentDidMount(): void {
-    // Subscribe to state changes
     this._stateService.subscribe(this._handleStateChange);
-    console.log("VideoFilter mounted and subscribed to state changes");
   }
 
   public componentWillUnmount(): void {
-    // Unsubscribe from state changes
     this._stateService.unsubscribe(this._handleStateChange);
-    console.log("VideoFilter unmounted and unsubscribed from state changes");
   }
 
   private _handleStateChange(): void {
-    console.log("VideoFilter received state change notification");
-
     // Update local state when shared state changes
     this.setState({
       filterOptions: this._stateService.getFilterOptions(),
-    });
-
-    // Refresh options in case videos have changed
-    this.setState({
       categoryOptions: this._getUniqueOptions("category"),
       departmentOptions: this._getUniqueOptions("department"),
     });
@@ -111,7 +100,6 @@ export default class VideoFilter extends React.Component<
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string
   ): void => {
-    console.log("Search term changed to:", newValue);
     this._stateService.updateFilterOptions({ searchTerm: newValue || "" });
   };
 
@@ -120,7 +108,6 @@ export default class VideoFilter extends React.Component<
     option?: IDropdownOption
   ): void => {
     if (option) {
-      console.log("Category changed to:", option.key);
       this._stateService.updateFilterOptions({
         selectedCategory: option.key as string,
       });
@@ -132,7 +119,6 @@ export default class VideoFilter extends React.Component<
     option?: IDropdownOption
   ): void => {
     if (option) {
-      console.log("Department changed to:", option.key);
       this._stateService.updateFilterOptions({
         selectedDepartment: option.key as string,
       });
@@ -144,7 +130,6 @@ export default class VideoFilter extends React.Component<
     option?: IChoiceGroupOption
   ): void => {
     if (option) {
-      console.log("Duration filter changed to:", option.key);
       this._stateService.updateFilterOptions({ durationFilter: option.key });
     }
   };
@@ -154,7 +139,6 @@ export default class VideoFilter extends React.Component<
     option?: IDropdownOption
   ): void => {
     if (option) {
-      console.log("Sort by changed to:", option.key);
       this._stateService.updateFilterOptions({ sortBy: option.key as string });
     }
   };
@@ -162,8 +146,18 @@ export default class VideoFilter extends React.Component<
   private _toggleSortDirection = (): void => {
     const newDirection =
       this.state.filterOptions.sortDirection === "asc" ? "desc" : "asc";
-    console.log("Sort direction changed to:", newDirection);
     this._stateService.updateFilterOptions({ sortDirection: newDirection });
+  };
+
+  private _resetFilters = (): void => {
+    this._stateService.updateFilterOptions({
+      searchTerm: "",
+      selectedCategory: "",
+      selectedDepartment: "",
+      durationFilter: "all",
+      sortBy: "title",
+      sortDirection: "asc",
+    });
   };
 
   public render(): React.ReactElement<IVideoFilterProps> {
@@ -194,6 +188,15 @@ export default class VideoFilter extends React.Component<
 
     return (
       <div className={styles.filterContainer}>
+        <div className={styles.filterHeader}>
+          <h3 className={styles.filterTitle}>Video Filters</h3>
+          <DefaultButton
+            text="Reset Filters"
+            onClick={this._resetFilters}
+            className={styles.resetButton}
+          />
+        </div>
+
         <div className={styles.controlsContainer}>
           <div className={rowClass}>
             <div className={itemClass}>
