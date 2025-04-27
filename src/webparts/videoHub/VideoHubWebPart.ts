@@ -117,10 +117,10 @@ export default class VideoHubWebPart
   private _load(): Promise<IVideo[]> {
 
     const list = this.properties.libraryName || 'KMSVideoHub';
-    
+
     // Get the current page URL for the return link
     const currentPageUrl = window.location.href;
-    
+
     // Simplified query - no filter, we'll filter client-side
     const url =
       `${this.context.pageContext.web.absoluteUrl}` +
@@ -137,25 +137,25 @@ export default class VideoHubWebPart
       .then(j => {
         // Filter MP4 files client-side
         const items = j.value || [];
-        const mp4Items = items.filter(item => 
+        const mp4Items = items.filter(item =>
           item.FileLeafRef && item.FileLeafRef.toLowerCase().endsWith('.mp4')
         );
-        
+
         return mp4Items.map((it: any) => {
           // Get thumbnail URL from ThumbnailURL field
-          const thumb = it.ThumbnailURL && it.ThumbnailURL.Url 
-            ? it.ThumbnailURL.Url 
+          const thumb = it.ThumbnailURL && it.ThumbnailURL.Url
+            ? it.ThumbnailURL.Url
             : `${this.context.pageContext.web.absoluteUrl}/_layouts/15/images/videoicon.png`;
-          
+
           // Create the modern player URL based on the example
           const fileRef = it.FileRef || '';
-          
+
           // Format: /sites/kms/KMSVideoHub/Forms/AllItems.aspx?id=%2Fsites%2Fkms%2FKMSVideoHub%2FFileName&parent=%2Fsites%2Fkms%2FKMSVideoHub&source=<currentPageUrl>
           const encodedFileRef = encodeURIComponent(fileRef);
           const parentFolder = fileRef.substring(0, fileRef.lastIndexOf('/'));
           const encodedParentFolder = encodeURIComponent(parentFolder);
           const encodedSourceUrl = encodeURIComponent(currentPageUrl);
-          
+
           // Use 'source' parameter instead of 'src' for return URL
 //          // Build modern viewer URL that returns to the gallery
 // const modernPlayerUrl =
@@ -165,7 +165,7 @@ export default class VideoHubWebPart
 const modernPlayerUrl =
   `${parentFolder}/Forms/AllItems.aspx?Source=${encodeURIComponent(currentPageUrl)}` +
   `&id=${encodedFileRef}&parent=${encodedParentFolder}`;
-            
+
           return {
             id: it.Id,
             title: it.Title || (it.FileLeafRef ? it.FileLeafRef.replace('.mp4', '') : 'Untitled Video'),
@@ -186,9 +186,9 @@ const modernPlayerUrl =
         header: { description: 'Settings' },
         groups: [{
           groupFields: [
-            PropertyPaneTextField('libraryName', { 
-              label: 'Library title', 
-              value: 'KMSVideoHub' 
+            PropertyPaneTextField('libraryName', {
+              label: 'Library title',
+              value: 'KMSVideoHub'
             })
           ]
         }]
