@@ -145,3 +145,142 @@
 .title  { margin: 0 0 6px; font-size: 16px; color: #333; }
 .playLink { color: #0078d4; text-decoration: none; font-weight: bold; }
 
+/* VideoHub.module.scss */
+/* VideoHub.module.scss */
+.videoHub {
+  margin: 0 -8px;
+
+  /* RTL support */
+  [dir='rtl'] & {
+    direction: rtl;
+    text-align: right;
+  }
+}
+
+.controlsContainer {
+  margin-bottom: 16px;
+}
+
+.controlsRow {
+  display: flex;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+
+  /* RTL support */
+  [dir='rtl'] & {
+    flex-direction: row-reverse;
+  }
+}
+
+.controlItem {
+  margin-right: 8px;
+  margin-bottom: 8px;
+
+  /* RTL support */
+  [dir='rtl'] & {
+    margin-right: 0;
+    margin-left: 8px;
+  }
+}
+
+.videoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -6px;
+
+  /* RTL support - flex direction remains the same, just text alignment changes */
+  [dir='rtl'] & {
+    text-align: right;
+  }
+}
+
+.videoCard {
+  width: 220px;
+  margin: 6px;
+  text-decoration: none;
+}
+
+.cardContent {
+  width: 220px;
+}
+
+.durationText {
+  padding: 0 16px 8px 16px;
+  font-size: 12px;
+  color: #666666;
+
+  /* RTL support */
+  [dir='rtl'] & {
+    text-align: right;
+  }
+}
+
+.metadataText {
+  padding: 0 16px 8px 16px;
+  font-size: 12px;
+  color: #666666;
+
+  /* RTL support */
+  [dir='rtl'] & {
+    text-align: right;
+  }
+}
+
+.sortButton {
+  margin-top: 24px;
+}
+
+.noResults {
+  padding: 16px;
+  font-style: italic;
+
+  /* RTL support */
+  [dir='rtl'] & {
+    text-align: right;
+  }
+}
+/* VideoHub.module.scss */
+.videoHub {
+  margin: 0 -8px;
+}
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.controlsContainer {
+  margin-bottom: 16px;
+}
+
+.controlsRow {
+  display: flex;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.controlsRowRtl {
+  flex-direction: row-reverse;
+}
+
+.controlItem {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.controlItemRtl {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.videoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -6px;
+}
+
+.videoGridRtl {
+  text-align: right;
+}
+
+/* Rest of the styles... */
