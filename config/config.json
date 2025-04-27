@@ -2,17 +2,26 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",
   "bundles": {
-    "video-hub-web-part": {
+    "video-filter-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/videoHub/VideoHubWebPart.js",
-          "manifest": "./src/webparts/videoHub/VideoHubWebPart.manifest.json"
+          "entrypoint": "./lib/webparts/videoFilter/VideoFilterWebPart.js",
+          "manifest": "./src/webparts/videoFilter/VideoFilterWebPart.manifest.json"
+        }
+      ]
+    },
+    "video-grid-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/videoGrid/VideoGridWebPart.js",
+          "manifest": "./src/webparts/videoGrid/VideoGridWebPart.manifest.json"
         }
       ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "VideoHubWebPartStrings": "lib/webparts/videoHub/loc/{locale}.js"
+    "VideoFilterWebPartStrings": "lib/webparts/videoFilter/loc/{locale}.js",
+    "VideoGridWebPartStrings": "lib/webparts/videoGrid/loc/{locale}.js"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "3c66877a-9ef4-4e3d-8691-ae2ebb054ce8",
+  "alias": "VideoGridWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f75",
+      "group": { "default": "Other" },
+      "title": { "default": "Video Grid" },
+      "description": { "default": "Grid display for the Video Hub" },
+      "officeFabricIconFontName": "Video",
+      "properties": {
+        "libraryName": "KMSVideoHub"
+      }
+    }
+  ]
+}

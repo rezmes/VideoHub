@@ -2,7 +2,7 @@
 // VideoHub.tsx - Updated with filtering and sorting
 // VideoHub.tsx
 import * as React from "react";
-import { IVideo } from "./IVideo";
+import { IVideo } from "../../../shared/IVideo";
 import {
   DocumentCard,
   DocumentCardTitle,

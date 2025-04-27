@@ -240,13 +240,16 @@
   }
 }
 /* VideoHub.module.scss */
-.videoHub {
-  margin: 0 -8px;
+.filterContainer {
+  margin-bottom: 16px;
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid #eaeaea;
 }
 
-.rtl {
-  direction: rtl;
-  text-align: right;
+.gridContainer {
+  margin: 0 -8px;
 }
 
 .controlsContainer {
@@ -283,4 +286,45 @@
   text-align: right;
 }
 
-/* Rest of the styles... */
+.videoCard {
+  width: 220px;
+  margin: 6px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.videoCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.cardContent {
+  width: 220px;
+}
+
+.durationText {
+  padding: 0 16px 8px 16px;
+  font-size: 12px;
+  color: #666666;
+}
+
+.metadataText {
+  padding: 0 16px 8px 16px;
+  font-size: 12px;
+  color: #666666;
+}
+
+.sortButton {
+  margin-top: 24px;
+}
+
+.noResults {
+  padding: 16px;
+  font-style: italic;
+}
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
