@@ -13,22 +13,23 @@ import {
 } from "../../../shared/VideoHubStateService";
 import GenericDropdown from "../../../shared/components/GenericDropdown";
 import styles from './VideoFilter.module.scss';
+import * as mystrings from "VideoFilterWebPartStrings";
 
 // Temporary strings object until localization is properly set up
 const strings = {
-  FilterTitle: "Video Filters",
-  ResetFilters: "Reset Filters",
-  SearchPlaceholder: "Search videos...",
-  CategoryLabel: "Category",
-  DepartmentLabel: "Department",
-  DurationLabel: "Duration",
-  AllDurations: "All Durations",
-  ShortVideos: "Short (<5 min)",
-  MediumVideos: "Medium (5-15 min)",
-  LongVideos: "Long (>15 min)",
-  SortByLabel: "Sort by",
-  SortDirectionAsc: "Order: A to Z",
-  SortDirectionDesc: "Order: Z to A"
+  FilterTitle: mystrings.FilterTitle,
+  ResetFilters: mystrings.ResetFilters,
+  SearchPlaceholder: mystrings.SearchPlaceholder,
+  CategoryLabel: mystrings.CategoryLabel,
+  DepartmentLabel: mystrings.DepartmentLabel,
+  DurationLabel: mystrings.DurationLabel,
+  AllDurations: mystrings.AllDurations,
+  ShortVideos: mystrings.ShortVideos,
+  MediumVideos: mystrings.MediumVideos,
+  LongVideos: mystrings.LongVideos,
+  SortByLabel: mystrings.SortByLabel,
+  SortDirectionAsc: mystrings.SortDirectionAsc,
+  SortDirectionDesc: mystrings.SortDirectionDesc
 };
 
 export interface IVideoFilterProps {
