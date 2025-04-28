@@ -1,3 +1,4 @@
+// src\webparts\videoHub\loc\mystrings.d.ts
 declare interface IVideoHubWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
