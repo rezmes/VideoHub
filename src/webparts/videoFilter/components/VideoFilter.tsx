@@ -1,7 +1,7 @@
 // src/webparts/videoFilter/components/VideoFilter.tsx
 import * as React from "react";
 import { TextField } from "office-ui-fabric-react/lib/TextField";
-import { Dropdown, IDropdownOption } from "office-ui-fabric-react/lib/Dropdown";
+import { IDropdownOption } from "office-ui-fabric-react/lib/Dropdown";
 import { DefaultButton } from "office-ui-fabric-react/lib/Button";
 import {
   ChoiceGroup,
@@ -11,7 +11,25 @@ import {
   VideoHubStateService,
   IVideoFilterOptions,
 } from "../../../shared/VideoHubStateService";
-import styles from "../../videoHub/components/VideoHub.module.scss";
+import GenericDropdown from "../../../shared/components/GenericDropdown";
+import styles from './VideoFilter.module.scss';
+
+// Temporary strings object until localization is properly set up
+const strings = {
+  FilterTitle: "Video Filters",
+  ResetFilters: "Reset Filters",
+  SearchPlaceholder: "Search videos...",
+  CategoryLabel: "Category",
+  DepartmentLabel: "Department",
+  DurationLabel: "Duration",
+  AllDurations: "All Durations",
+  ShortVideos: "Short (<5 min)",
+  MediumVideos: "Medium (5-15 min)",
+  LongVideos: "Long (>15 min)",
+  SortByLabel: "Sort by",
+  SortDirectionAsc: "Order: A to Z",
+  SortDirectionDesc: "Order: Z to A"
+};
 
 export interface IVideoFilterProps {
   isRTL?: boolean;
@@ -100,24 +118,22 @@ export default class VideoFilter extends React.Component<
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string
   ): void => {
+    console.log('Search term:', newValue);
     this._stateService.updateFilterOptions({ searchTerm: newValue || "" });
   };
 
-  private _handleCategoryChange = (
-    event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption
-  ): void => {
+  private _handleCategoryChange = (option?: IDropdownOption): void => {
+    console.log('Category selected:', option);
     if (option) {
       this._stateService.updateFilterOptions({
         selectedCategory: option.key as string,
       });
+      console.log('After update - filterOptions:', this._stateService.getFilterOptions());
     }
   };
 
-  private _handleDepartmentChange = (
-    event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption
-  ): void => {
+  private _handleDepartmentChange = (option?: IDropdownOption): void => {
+    console.log('Department selected:', option);
     if (option) {
       this._stateService.updateFilterOptions({
         selectedDepartment: option.key as string,
@@ -129,15 +145,14 @@ export default class VideoFilter extends React.Component<
     ev?: React.FormEvent<HTMLElement | HTMLInputElement>,
     option?: IChoiceGroupOption
   ): void => {
+    console.log('Duration selected:', option);
     if (option) {
       this._stateService.updateFilterOptions({ durationFilter: option.key });
     }
   };
 
-  private _handleSortChange = (
-    event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption
-  ): void => {
+  private _handleSortChange = (option?: IDropdownOption): void => {
+    console.log('Sort option selected:', option);
     if (option) {
       this._stateService.updateFilterOptions({ sortBy: option.key as string });
     }
@@ -146,10 +161,12 @@ export default class VideoFilter extends React.Component<
   private _toggleSortDirection = (): void => {
     const newDirection =
       this.state.filterOptions.sortDirection === "asc" ? "desc" : "asc";
+    console.log('Toggling sort direction to:', newDirection);
     this._stateService.updateFilterOptions({ sortDirection: newDirection });
   };
 
   private _resetFilters = (): void => {
+    console.log('Resetting filters');
     this._stateService.updateFilterOptions({
       searchTerm: "",
       selectedCategory: "",
@@ -164,13 +181,13 @@ export default class VideoFilter extends React.Component<
     const { isRTL } = this.props;
     const { filterOptions } = this.state;
 
-    // Apply RTL classes conditionally
-    const rowClass = isRTL
-      ? `${styles.controlsRow} ${styles.controlsRowRtl}`
-      : styles.controlsRow;
-    const itemClass = isRTL
-      ? `${styles.controlItem} ${styles.controlItemRtl}`
-      : styles.controlItem;
+    console.log('Rendering with filterOptions:', filterOptions);
+    console.log('Category options:', this.state.categoryOptions);
+    console.log('Department options:', this.state.departmentOptions);
+
+    // Apply RTL classes conditionally using string indexing to avoid TypeScript errors
+    const rowClass = `${styles.controlsRow}${isRTL ? ' ' + styles['controlsRowRtl'] : ''}`;
+    const itemClass = `${styles.controlItem}${isRTL ? ' ' + styles['controlItemRtl'] : ''}`;
 
     const sortOptions: IDropdownOption[] = [
       { key: "title", text: "Title" },
@@ -180,18 +197,18 @@ export default class VideoFilter extends React.Component<
     ];
 
     const durationOptions: IChoiceGroupOption[] = [
-      { key: "all", text: "All Durations" },
-      { key: "short", text: "Short (<5 min)" },
-      { key: "medium", text: "Medium (5-15 min)" },
-      { key: "long", text: "Long (>15 min)" },
+      { key: "all", text: strings.AllDurations },
+      { key: "short", text: strings.ShortVideos },
+      { key: "medium", text: strings.MediumVideos },
+      { key: "long", text: strings.LongVideos },
     ];
 
     return (
       <div className={styles.filterContainer}>
         <div className={styles.filterHeader}>
-          <h3 className={styles.filterTitle}>Video Filters</h3>
+          <h3 className={styles.filterTitle}>{strings.FilterTitle}</h3>
           <DefaultButton
-            text="Reset Filters"
+            text={strings.ResetFilters}
             onClick={this._resetFilters}
             className={styles.resetButton}
           />
@@ -199,28 +216,30 @@ export default class VideoFilter extends React.Component<
 
         <div className={styles.controlsContainer}>
           <div className={rowClass}>
-            <div className={itemClass}>
+            <div className={`${itemClass} ${styles.searchBox}`}>
               <TextField
-                placeholder="Search videos..."
+                placeholder={strings.SearchPlaceholder}
                 onChange={this._handleSearch}
                 value={filterOptions.searchTerm}
                 ariaLabel="Search videos"
               />
             </div>
             <div className={itemClass}>
-              <Dropdown
-                label="Category"
+              <GenericDropdown
+                label={strings.CategoryLabel}
                 selectedKey={filterOptions.selectedCategory}
                 options={this.state.categoryOptions}
-                onChange={this._handleCategoryChange}
+                onChanged={this._handleCategoryChange}
+                className={styles.dropdown}
               />
             </div>
             <div className={itemClass}>
-              <Dropdown
-                label="Department"
+              <GenericDropdown
+                label={strings.DepartmentLabel}
                 selectedKey={filterOptions.selectedDepartment}
                 options={this.state.departmentOptions}
-                onChange={this._handleDepartmentChange}
+                onChanged={this._handleDepartmentChange}
+                className={styles.dropdown}
               />
             </div>
           </div>
@@ -231,25 +250,26 @@ export default class VideoFilter extends React.Component<
                 options={durationOptions}
                 selectedKey={filterOptions.durationFilter}
                 onChange={this._handleDurationFilterChange}
-                label="Duration"
+                label={strings.DurationLabel}
               />
             </div>
           </div>
 
           <div className={rowClass}>
             <div className={itemClass}>
-              <Dropdown
-                label="Sort by"
+              <GenericDropdown
+                label={strings.SortByLabel}
                 selectedKey={filterOptions.sortBy}
                 options={sortOptions}
-                onChange={this._handleSortChange}
+                onChanged={this._handleSortChange}
+                className={styles.dropdown}
               />
             </div>
             <div className={itemClass}>
               <DefaultButton
-                text={`Order: ${
-                  filterOptions.sortDirection === "asc" ? "A to Z" : "Z to A"
-                }`}
+                text={filterOptions.sortDirection === "asc" 
+                  ? strings.SortDirectionAsc 
+                  : strings.SortDirectionDesc}
                 onClick={this._toggleSortDirection}
                 className={styles.sortButton}
               />

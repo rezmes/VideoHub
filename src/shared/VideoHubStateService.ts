@@ -100,4 +100,87 @@ export class VideoHubStateService {
       }
     }
   }
+
+  // Add to VideoHubStateService.ts
+// Add to VideoHubStateService.ts
+public getFilteredVideos(): IVideo[] {
+  const videos = this._videos;
+  const filterOptions = this._filterOptions;
+  let filtered = videos.slice();
+
+  // Filter by search term
+  if (filterOptions.searchTerm) {
+    const term = filterOptions.searchTerm.toLowerCase();
+    filtered = filtered.filter(video => 
+      video.title.toLowerCase().indexOf(term) !== -1
+    );
+  }
+
+  // Filter by category
+  if (filterOptions.selectedCategory) {
+    filtered = filtered.filter(video => 
+      video.category === filterOptions.selectedCategory
+    );
+  }
+
+  // Filter by department
+  if (filterOptions.selectedDepartment) {
+    filtered = filtered.filter(video => 
+      video.department === filterOptions.selectedDepartment
+    );
+  }
+
+  // Filter by duration
+  if (filterOptions.durationFilter !== "all") {
+    filtered = filtered.filter(video => {
+      const durationInSeconds = this._parseDuration(video.duration);
+      
+      if (filterOptions.durationFilter === "short") {
+        return durationInSeconds < 300; // Less than 5 minutes
+      } else if (filterOptions.durationFilter === "medium") {
+        return durationInSeconds >= 300 && durationInSeconds < 900; // 5-15 minutes
+      } else if (filterOptions.durationFilter === "long") {
+        return durationInSeconds >= 900; // 15+ minutes
+      }
+      
+      return true;
+    });
+  }
+
+  // Sort videos
+  filtered.sort((a, b) => {
+    let comparison = 0;
+
+    if (filterOptions.sortBy === "title") {
+      comparison = a.title.localeCompare(b.title);
+    } else if (filterOptions.sortBy === "duration") {
+      comparison = this._parseDuration(a.duration) - this._parseDuration(b.duration);
+    } else if (filterOptions.sortBy === "category") {
+      comparison = (a.category || "").localeCompare(b.category || "");
+    } else if (filterOptions.sortBy === "department") {
+      comparison = (a.department || "").localeCompare(b.department || "");
+    }
+
+    return filterOptions.sortDirection === "asc" ? comparison : -comparison;
+  });
+
+  return filtered;
+}
+
+private _parseDuration(duration: string): number {
+  if (!duration) return 0;
+
+  const parts = duration.split(":").map(part => parseInt(part, 10));
+
+  if (parts.length === 2) {
+    return parts[0] * 60 + parts[1];
+  } else if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+
+  return 0;
+}
+
+
+
 }

@@ -1,3 +1,4 @@
+// src\webparts\videoFilter\VideoFilterWebPart.manifest.json
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
   "id": "2b55877a-9ef4-4e3d-8691-ae2ebb054ce7",
@@ -10,7 +11,7 @@
     {
       "groupId": "5c03119e-3074-46fd-976b-c60198311f78",
       "group": { "default": "Other" },
-      "title": { "default": "Video Filter" },
+      "title": { "default": "جستجوی پیشرفته ویدئو" },
       "description": { "default": "Filtering controls for the Video Hub" },
       "officeFabricIconFontName": "Filter",
       "properties": {

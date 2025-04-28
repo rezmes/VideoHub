@@ -51,7 +51,7 @@ console.log('State service instance ID:', this._stateService);
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [{
-        header: { description: "Configure the Video Filter web part" },
+        header: { description: "Configure the Filter Video web part" },
         groups: [{
           groupName: "Settings",
           groupFields: [

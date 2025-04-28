@@ -1,3 +1,30 @@
+// {
+//   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+//   "version": "2.0",
+//   "bundles": {
+//     "video-filter-web-part": {
+//       "components": [
+//         {
+//           "entrypoint": "./lib/webparts/videoFilter/VideoFilterWebPart.js",
+//           "manifest": "./src/webparts/videoFilter/VideoFilterWebPart.manifest.json"
+//         }
+//       ]
+//     },
+//     "video-grid-web-part": {
+//       "components": [
+//         {
+//           "entrypoint": "./lib/webparts/videoGrid/VideoGridWebPart.js",
+//           "manifest": "./src/webparts/videoGrid/VideoGridWebPart.manifest.json"
+//         }
+//       ]
+//     }
+//   },
+//   "externals": {},
+//   "localizedResources": {
+//     "VideoFilterWebPartStrings": "lib/webparts/videoFilter/loc/{locale}.js",
+//     "VideoGridWebPartStrings": "lib/webparts/videoGrid/loc/{locale}.js"
+//   }
+// }
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",

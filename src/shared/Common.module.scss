@@ -1,0 +1,7 @@
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+
+// RTL support
+.rtl {
+  direction: rtl;
+  text-align: right;
+}

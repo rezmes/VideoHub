@@ -12,7 +12,7 @@ import {
   IVideoFilterOptions,
 } from "../../../shared/VideoHubStateService";
 import { IVideo } from "../../../shared/IVideo";
-import styles from "../../videoHub/components/VideoHub.module.scss";
+import styles from './VideoGrid.module.scss';
 
 export interface IVideoGridProps {
   isRTL?: boolean;
@@ -58,109 +58,13 @@ export default class VideoGrid extends React.Component<
     });
   }
 
-  private _parseDuration(duration: string): number {
-    if (!duration) return 0;
+// In VideoGrid.tsx
+private _getFilteredVideos(): IVideo[] {
+  return this._stateService.getFilteredVideos();
+}
 
-    const parts = duration.split(":").map(function (part) {
-      return parseInt(part, 10);
-    });
+// Remove the duplicate _parseDuration method and filtering logic
 
-    if (parts.length === 2) {
-      return parts[0] * 60 + parts[1];
-    } else if (parts.length === 3) {
-      return parts[0] * 3600 + parts[1] * 60 + parts[2];
-    }
-
-    return 0;
-  }
-
-  private _getFilteredVideos(): IVideo[] {
-    const videos = this._stateService.getVideos();
-    const filterOptions = this._stateService.getFilterOptions();
-
-    let filtered = videos.slice();
-
-    // Filter by search term
-    if (filterOptions.searchTerm) {
-      const term = filterOptions.searchTerm.toLowerCase();
-      const tempFiltered = [];
-      for (let i = 0; i < filtered.length; i++) {
-        if (filtered[i].title.toLowerCase().indexOf(term) !== -1) {
-          tempFiltered.push(filtered[i]);
-        }
-      }
-      filtered = tempFiltered;
-    }
-
-    // Filter by category
-    if (filterOptions.selectedCategory) {
-      const tempFiltered = [];
-      for (let i = 0; i < filtered.length; i++) {
-        if (filtered[i].category === filterOptions.selectedCategory) {
-          tempFiltered.push(filtered[i]);
-        }
-      }
-      filtered = tempFiltered;
-    }
-
-    // Filter by department
-    if (filterOptions.selectedDepartment) {
-      const tempFiltered = [];
-      for (let i = 0; i < filtered.length; i++) {
-        if (filtered[i].department === filterOptions.selectedDepartment) {
-          tempFiltered.push(filtered[i]);
-        }
-      }
-      filtered = tempFiltered;
-    }
-
-    // Filter by duration
-    if (filterOptions.durationFilter !== "all") {
-      const tempFiltered = [];
-      for (let i = 0; i < filtered.length; i++) {
-        const durationInSeconds = this._parseDuration(filtered[i].duration);
-
-        if (
-          filterOptions.durationFilter === "short" &&
-          durationInSeconds < 300
-        ) {
-          tempFiltered.push(filtered[i]);
-        } else if (
-          filterOptions.durationFilter === "medium" &&
-          durationInSeconds >= 300 &&
-          durationInSeconds < 900
-        ) {
-          tempFiltered.push(filtered[i]);
-        } else if (
-          filterOptions.durationFilter === "long" &&
-          durationInSeconds >= 900
-        ) {
-          tempFiltered.push(filtered[i]);
-        }
-      }
-      filtered = tempFiltered;
-    }
-
-    // Sort videos
-    filtered.sort((a, b) => {
-      let comparison = 0;
-
-      if (filterOptions.sortBy === "title") {
-        comparison = a.title.localeCompare(b.title);
-      } else if (filterOptions.sortBy === "duration") {
-        comparison =
-          this._parseDuration(a.duration) - this._parseDuration(b.duration);
-      } else if (filterOptions.sortBy === "category") {
-        comparison = (a.category || "").localeCompare(b.category || "");
-      } else if (filterOptions.sortBy === "department") {
-        comparison = (a.department || "").localeCompare(b.department || "");
-      }
-
-      return filterOptions.sortDirection === "asc" ? comparison : -comparison;
-    });
-
-    return filtered;
-  }
 
   public render(): React.ReactElement<IVideoGridProps> {
     const { isRTL, webUrl } = this.props;
@@ -180,7 +84,7 @@ export default class VideoGrid extends React.Component<
         <div className={styles.gridHeader}>
           <div className={styles.videoCount}>
             {filteredVideos.length > 0
-              ? `Showing ${filteredVideos.length} of ${totalVideos} videos`
+              ? `نمایش ${filteredVideos.length} از ${totalVideos} ویدئو`
               : totalVideos > 0
               ? "No videos match your search criteria"
               : "Loading videos..."}
@@ -242,7 +146,7 @@ export default class VideoGrid extends React.Component<
                       <div className={styles.videoStats}>
                         {v.viewCount !== undefined && (
                           <span className={styles.viewCount}>
-                            {v.viewCount} {v.viewCount === 1 ? "view" : "views"}
+                            {v.viewCount} {v.viewCount === 1 ? "نمایش" : "نمایش"}
                           </span>
                         )}
                         {v.uploadDate && (
@@ -256,7 +160,7 @@ export default class VideoGrid extends React.Component<
                       )}
                       {v.category && (
                         <div className={styles.metadataText}>
-                          Category: {v.category}
+                          دسته: {v.category}
                         </div>
                       )}
                       {v.department && (

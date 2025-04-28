@@ -1,0 +1,141 @@
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+
+.filterContainer {
+  margin-bottom: 16px;
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.filterTitle {
+  margin: 0;
+  font-size: 18px;
+  color: #030303;
+}
+
+.resetButton {
+  background-color: #f2f2f2;
+  border: none;
+  &:hover {
+    background-color: #e5e5e5;
+  }
+}
+
+.controlsContainer {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.controlsRow {
+  display: flex;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  
+  [dir='rtl'] & {
+    flex-direction: row-reverse;
+  }
+}
+
+.controlsRowRtl {
+  flex-direction: row-reverse;
+}
+
+.controlItem {
+  flex: 1 1 auto;
+  min-width: 120px;
+  max-width: 300px;
+  margin-bottom: 8px;
+  
+  /* Ensure dropdown doesn't overflow its container */
+  :global(.ms-Dropdown-container) {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Ensure dropdown items don't overflow */
+  :global(.ms-Dropdown-items) {
+    max-width: 300px;
+  }
+  
+  /* Ensure text in dropdown doesn't cause overflow */
+  :global(.ms-Dropdown-title),
+  :global(.ms-Dropdown-caretDown) {
+    max-width: 100%;
+  }
+  
+  [dir='rtl'] & {
+    margin-right: 0;
+    margin-left: 8px;
+  }
+}
+
+.controlItemRtl {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* For search box */
+.searchBox {
+  flex: 2 1 auto;
+  min-width: 200px;
+  
+  :global(.ms-TextField-fieldGroup) {
+    width: 100%;
+  }
+}
+
+/* For smaller screens */
+@media (max-width: 768px) {
+  .controlsRow {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .controlItem {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  [dir='rtl'] .controlsRow {
+    flex-direction: column;
+  }
+}
+
+.sortButton {
+  margin-top: 24px;
+  white-space: nowrap;
+}
+
+/* For dropdown callout (the dropdown menu) */
+:global(.ms-Callout) {
+  max-width: 300px;
+}
+
+:global(.ms-Dropdown-item) {
+  white-space: normal;
+  word-break: break-word;
+}
+.dropdown {
+  width: 100%;
+  
+  :global(.ms-Dropdown-title) {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

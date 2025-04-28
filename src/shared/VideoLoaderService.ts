@@ -349,20 +349,20 @@ private _formatDateAsTimeAgo(date: Date): string {
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
   if (diffInDays < 1) {
-    return 'Today';
+    return 'امروز';
   } else if (diffInDays === 1) {
-    return 'Yesterday';
+    return 'دیروز';
   } else if (diffInDays < 7) {
-    return `${diffInDays} days ago`;
+    return `${diffInDays} چندین روز قبل`;
   } else if (diffInDays < 30) {
     const weeks = Math.floor(diffInDays / 7);
-    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+    return `${weeks} ${weeks === 1 ? 'هفته' : 'هفته‌ها'} پیش`;
   } else if (diffInDays < 365) {
     const months = Math.floor(diffInDays / 30);
-    return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+    return `${months} ${months === 1 ? 'ماه' : 'ماه‌ها'} پیش`;
   } else {
     const years = Math.floor(diffInDays / 365);
-    return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+    return `${years} ${years === 1 ? 'سال' : 'سال‌ها'} پیش`;
   }
 }
 
